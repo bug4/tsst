@@ -456,6 +456,7 @@ const Website = () => {
               <span className="font-mono text-xl">TERA SYSTEMS</span>
             </div>
             <div className="flex items-center gap-4">
+              {/* Existing icons/buttons */}
               <div className="flex gap-2">
                 <Power className="w-4 h-4 text-lime-500 animate-pulse" />
                 <Cpu className="w-4 h-4 text-lime-500" />
@@ -468,6 +469,27 @@ const Website = () => {
                 <TerminalIcon className="w-4 h-4" />
                 <span>Access Terminal</span>
               </button>
+              {/* Twitter Button */}
+              <a
+                href="https://x.com/TeraSystemsAI"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-4 py-2 border border-lime-500/50 rounded-full hover:bg-lime-500/10 transition-colors"
+              >
+                <svg
+                  className="w-5 h-5 text-lime-500"
+                  xmlns="http://www.w3.org/2000/svg"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0016 3a4.48 4.48 0 00-4.47 5.42A12.94 12.94 0 013 4s-4 9 5 13a13.37 13.37 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A10.66 10.66 0 0023 3z" />
+                </svg>
+                <span className="text-lime-500 font-mono text-sm">Twitter</span>
+              </a>
             </div>
           </div>
         </header>
@@ -480,7 +502,7 @@ const Website = () => {
                 Next Generation AI Systems
               </h1>
               <p className="text-lime-400/80">
-                Advanced TERA computing solutions for the future of terasystems.
+                Advanced TERA computing solutions for the future of teras systems.
               </p>
               <div className="flex gap-4">
                 <Cpu className="w-8 h-8" />
