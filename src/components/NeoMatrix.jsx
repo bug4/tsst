@@ -89,111 +89,61 @@ const SocialButtons = () => {
   );
 };
 
-const CircuitBoard = () => {
-  const canvasRef = useRef(null);
+const MatrixRain = () => {
+  const [raindrops, setRaindrops] = useState([]);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
+    const chars = '01010101ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+    const columns = Math.floor(window.innerWidth / 20);
     
-    const nodes = [];
-    const paths = [];
-    
-    // Create nodes
-    const createNodes = () => {
-      const gridSize = 50;
-      for (let x = 0; x < canvas.width; x += gridSize) {
-        for (let y = 0; y < canvas.height; y += gridSize) {
-          if (Math.random() > 0.7) {
-            nodes.push({
-              x: x + Math.random() * 20 - 10,
-              y: y + Math.random() * 20 - 10,
-              pulseSize: 0,
-              pulseSpeed: Math.random() * 0.1 + 0.05
-            });
-          }
-        }
-      }
-    };
+    const generateRaindrop = () => ({
+      id: Math.random(),
+      x: Math.floor(Math.random() * columns) * 20,
+      y: -20,
+      speed: 1 + Math.random() * 2,
+      char: chars[Math.floor(Math.random() * chars.length)],
+      opacity: Math.random() * 0.5 + 0.5
+    });
 
-    // Create paths between nodes
-    const createPaths = () => {
-      nodes.forEach((node, i) => {
-        nodes.slice(i + 1).forEach(otherNode => {
-          if (
-            Math.abs(node.x - otherNode.x) < 100 &&
-            Math.abs(node.y - otherNode.y) < 100
-          ) {
-            paths.push({
-              start: node,
-              end: otherNode,
-              pulse: 0,
-              pulseSpeed: Math.random() * 2 + 1
-            });
+    const initialRaindrops = Array.from({ length: 50 }, generateRaindrop);
+    setRaindrops(initialRaindrops);
+
+    const interval = setInterval(() => {
+      setRaindrops(prevDrops => {
+        return prevDrops.map(drop => {
+          if (drop.y > window.innerHeight) {
+            return generateRaindrop();
           }
+          return {
+            ...drop,
+            y: drop.y + drop.speed,
+            char: Math.random() < 0.1 ? chars[Math.floor(Math.random() * chars.length)] : drop.char
+          };
         });
       });
-    };
+    }, 50);
 
-    const animate = () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Draw paths
-      paths.forEach(path => {
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(0, 255, 255, ${0.3 + Math.sin(path.pulse) * 0.2})`;
-        ctx.lineWidth = 1;
-        ctx.moveTo(path.start.x, path.start.y);
-        ctx.lineTo(path.end.x, path.end.y);
-        ctx.stroke();
-        path.pulse += path.pulseSpeed / 60;
-      });
-
-      // Draw nodes
-      nodes.forEach(node => {
-        ctx.beginPath();
-        ctx.fillStyle = '#00ffff';
-        ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
-        ctx.fill();
-
-        // Draw pulse
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(0, 255, 255, ${0.5 - node.pulseSize / 20})`;
-        ctx.arc(node.x, node.y, node.pulseSize, 0, Math.PI * 2);
-        ctx.stroke();
-        node.pulseSize += node.pulseSpeed;
-        if (node.pulseSize > 20) node.pulseSize = 0;
-      });
-
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    const handleResize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      nodes.length = 0;
-      paths.length = 0;
-      createNodes();
-      createPaths();
-    };
-
-    handleResize();
-    animate();
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
-    };
+    return () => clearInterval(interval);
   }, []);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className="fixed inset-0 pointer-events-none"
-      style={{ background: 'black' }}
-    />
+    <div className="fixed inset-0 pointer-events-none overflow-hidden">
+      {raindrops.map(drop => (
+        <div
+          key={drop.id}
+          className="absolute font-mono text-lime-500"
+          style={{
+            left: `${drop.x}px`,
+            top: `${drop.y}px`,
+            opacity: drop.opacity,
+            textShadow: '0 0 8px rgba(0, 255, 0, 0.8)',
+            transition: 'opacity 0.5s'
+          }}
+        >
+          {drop.char}
+        </div>
+      ))}
+    </div>
   );
 };
 
@@ -254,12 +204,7 @@ system@core:~$ `);
       case 'help':
         return `Available commands:
   • solana   - Show Solana network status
-  • balance  - Display your wallet balance
-  • nft      - Fetch a Matrix-themed NFT
-  • stake    - Stake your SOL (mock)
-  • matrix   - Toggle Matrix rain effect
-  • hack     - "Hack" the Solana network (mock)
-  • validate - Check Solana validator status
+  • ca       - Display ZION contract address
   • nodes    - Show active Solana nodes
   • clear    - Clear terminal`;
   
@@ -270,33 +215,9 @@ system@core:~$ `);
   • Network Latency: 0.3ms
   • Last Epoch Rewards: 4.7% APY`;
   
-      case 'balance':
-        return `Your Wallet Balance:
-  • 25.3 SOL
-  • 4,320 Matrix Tokens`;
-  
-      case 'nft':
-        return `Matrix-Themed NFT:
-  "Neo's Code Rain" - An AI-crafted NFT showcasing endless streams of Matrix green code dripping into the Solana network.`;
-  
-      case 'stake':
-        return `Staking Initialized:
-  • Delegating 10 SOL to Validator X
-  • Expected Rewards: 5.1% APY`;
-  
-      case 'matrix':
-        return `Activating Matrix Effect...
-  (Feature will toggle a Matrix rain animation!)`;
-  
-      case 'hack':
-        return `Accessing Solana Core...
-  Just kidding! You can't hack the blockchain 😉`;
-  
-      case 'validate':
-        return `Solana Validators:
-  • Active Validators: 1,875
-  • Stake Distributed: 65.3%
-  • Top Validator: Validator-42`;
+      case 'ca':
+        return `ZION COntract Address:
+  • Fetching Information ...`;
   
       case 'nodes':
         return `Active Solana Nodes:
@@ -335,7 +256,7 @@ system@core:~$ `);
 
   return (
     <div className="min-h-screen bg-black text-cyan-500 relative">
-      <CircuitBoard />
+      <MatrixRain />
       
       <div className="relative z-10">
         <header className="border-b border-cyan-500/30 backdrop-blur-sm bg-black/50 sticky top-0">
