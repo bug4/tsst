@@ -305,7 +305,7 @@ zyon@core:~$ `);
         return '';
   
       default:
-        return `Command not recognized. Type 'help' for available commands.`;
+        return `ZION AI is currently in beta testing, fine-tuning every aspect to ensure a seamless experience. I’ll be available to the world very soon! In the meantime, type HELP to explore currently available commands and features. Stay tuned – this is just the beginning!`;
     }
   };
 
