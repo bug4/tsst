@@ -240,16 +240,16 @@ const InfoPanel = ({ title, children }) => (
 );
 
 const Website = () => {
-  const [text, setText] = useState(`AUTONOMOUS SYSTEM V1.0.0
+  const [text, setText] = useState(`ZION SYSTEM V1.0.0
 =====================================
 Last login: ${new Date().toLocaleString()}
-Connected to: Quantum Core Network
+Connected to: ZION Core Network
 Security Protocol: ACTIVE
 Neural Interface: STABLE
 
 Type 'help' for available commands
 
-system@core:~$ `);
+zyon@core:~$ `);
   const [cursorVisible, setCursorVisible] = useState(true);
   const [currentInput, setCurrentInput] = useState('');
   const [commandHistory, setCommandHistory] = useState([]);
@@ -337,7 +337,7 @@ system@core:~$ `);
           <div className="container mx-auto flex justify-between items-center p-4">
             <div className="flex items-center gap-2">
               <Shield className="w-6 h-6 animate-pulse" />
-              <span className="font-mono text-xl">NAME</span>
+              <span className="font-mono text-xl">Zion Technologies AI</span>
             </div>
             <div className="flex gap-4 items-center">
               <div className="flex gap-2">
