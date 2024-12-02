@@ -3,85 +3,36 @@ import {
   Shield, 
   Cpu, 
   Wifi, 
-  Terminal as TerminalIcon, 
   Power, 
-  Database, 
-  Cloud, 
-  Lock, 
-  Activity,
   Volume2,
-  VolumeX 
+  VolumeX,
+  Server,
+  Globe,
+  Zap,
+  Code
 } from 'lucide-react';
 
-const LoadingScreen = () => {
-  const [progress, setProgress] = useState(0);
+// Style for the scrollbar
+const scrollbarStyle = `
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 255, 255, 0.3) transparent;
+  }
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setProgress(prev => {
-        if (prev < 100) return prev + 1;
-        clearInterval(interval);
-        return 100;
-      });
-    }, 50);
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
 
-    return () => clearInterval(interval);
-  }, []);
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+  }
 
-  return (
-    <div className="fixed inset-0 bg-black z-50 flex flex-col items-center justify-center min-h-screen">
-      <div className="text-center w-full max-w-md px-4">
-        {/* Centered Hexagon Animation */}
-        <div className="relative w-48 h-48 mx-auto mb-8">
-          {[...Array(3)].map((_, i) => (
-            <div
-              key={i}
-              className="absolute inset-0"
-              style={{
-                border: '2px solid #00ff00',
-                borderRadius: '50%',
-                animation: `spin ${3 + i}s linear infinite${i % 2 ? ' reverse' : ''}`,
-                borderLeftColor: 'transparent',
-                borderRightColor: 'transparent',
-                left: '50%',
-                top: '50%',
-                transform: 'translate(-50%, -50%)',
-                width: `${100 - i * 20}%`,
-                height: `${100 - i * 20}%`,
-              }}
-            />
-          ))}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="text-lime-500 text-4xl font-bold font-mono">
-              {progress}%
-            </div>
-          </div>
-        </div>
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 255, 0.3);
+    border-radius: 2px;
+  }
+`;
 
-        {/* Loading Text */}
-        <div className="space-y-4">
-          <div className="text-lime-500 font-mono text-xl tracking-widest">
-            SYSTEM INITIALIZATION
-          </div>
-          <div className="w-64 h-2 bg-lime-900/30 rounded-full mx-auto overflow-hidden">
-            <div 
-              className="h-full bg-lime-500 transition-all duration-300"
-              style={{ 
-                width: `${progress}%`,
-                boxShadow: '0 0 10px rgba(0, 255, 0, 0.5)'
-              }}
-            />
-          </div>
-          <div className="text-lime-500/70 font-mono text-sm animate-pulse">
-            Loading TERA Systems...
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Music Player Component
 const MusicPlayer = () => {
   const [isPlaying, setIsPlaying] = useState(false);
   const audioRef = useRef(null);
@@ -96,233 +47,272 @@ const MusicPlayer = () => {
   };
 
   return (
-    <div className="fixed bottom-4 right-4 z-50">
-      <button
-        onClick={togglePlay}
-        className="flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm border border-lime-500/50 rounded-full hover:bg-lime-500/10 transition-all duration-300 group"
-      >
-        {isPlaying ? (
-          <Volume2 className="w-5 h-5 text-lime-500 animate-pulse" />
-        ) : (
-          <VolumeX className="w-5 h-5 text-lime-500" />
-        )}
-        <span className="text-lime-500 font-mono text-sm">
-          {isPlaying ? 'Music On' : 'Music Off'}
-        </span>
-      </button>
+    <button
+      onClick={togglePlay}
+      className="flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm border border-cyan-500/50 rounded-full hover:bg-cyan-500/10 transition-all duration-300 group"
+    >
+      {isPlaying ? (
+        <Volume2 className="w-5 h-5 text-cyan-500 animate-pulse" />
+      ) : (
+        <VolumeX className="w-5 h-5 text-cyan-500" />
+      )}
+      <span className="text-cyan-500 font-mono text-sm">
+        {isPlaying ? 'Music On' : 'Music Off'}
+      </span>
       <audio ref={audioRef} loop>
         <source src="/interstellar.mp3" type="audio/mp3" />
       </audio>
+    </button>
+  );
+};
+
+const SocialButtons = () => {
+  return (
+    <div className="fixed bottom-4 right-4 z-50 flex gap-2">
+      <MusicPlayer />
+      <a
+        href="https://twitter.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="flex items-center gap-2 px-4 py-2 bg-black/50 backdrop-blur-sm border border-cyan-500/50 rounded-full hover:bg-cyan-500/10 transition-all duration-300"
+      >
+        <svg 
+          className="w-5 h-5 text-cyan-500" 
+          viewBox="0 0 24 24" 
+          fill="currentColor"
+        >
+          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+        </svg>
+        <span className="text-cyan-500 font-mono text-sm">Twitter</span>
+      </a>
     </div>
   );
 };
 
-
-// Matrix Rain Background Component
-const MatrixRain = () => {
-  const [raindrops, setRaindrops] = useState([]);
+const CircuitBoard = () => {
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    const chars = '01010101ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
-    const columns = Math.floor(window.innerWidth / 20);
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
     
-    const generateRaindrop = () => ({
-      id: Math.random(),
-      x: Math.floor(Math.random() * columns) * 20,
-      y: -20,
-      speed: 1 + Math.random() * 2,
-      char: chars[Math.floor(Math.random() * chars.length)],
-      opacity: Math.random() * 0.5 + 0.5
-    });
-
-    const initialRaindrops = Array.from({ length: 50 }, generateRaindrop);
-    setRaindrops(initialRaindrops);
-
-    const interval = setInterval(() => {
-      setRaindrops(prevDrops => {
-        return prevDrops.map(drop => {
-          if (drop.y > window.innerHeight) {
-            return generateRaindrop();
+    const nodes = [];
+    const paths = [];
+    
+    // Create nodes
+    const createNodes = () => {
+      const gridSize = 50;
+      for (let x = 0; x < canvas.width; x += gridSize) {
+        for (let y = 0; y < canvas.height; y += gridSize) {
+          if (Math.random() > 0.7) {
+            nodes.push({
+              x: x + Math.random() * 20 - 10,
+              y: y + Math.random() * 20 - 10,
+              pulseSize: 0,
+              pulseSpeed: Math.random() * 0.1 + 0.05
+            });
           }
-          return {
-            ...drop,
-            y: drop.y + drop.speed,
-            char: Math.random() < 0.1 ? chars[Math.floor(Math.random() * chars.length)] : drop.char
-          };
+        }
+      }
+    };
+
+    // Create paths between nodes
+    const createPaths = () => {
+      nodes.forEach((node, i) => {
+        nodes.slice(i + 1).forEach(otherNode => {
+          if (
+            Math.abs(node.x - otherNode.x) < 100 &&
+            Math.abs(node.y - otherNode.y) < 100
+          ) {
+            paths.push({
+              start: node,
+              end: otherNode,
+              pulse: 0,
+              pulseSpeed: Math.random() * 2 + 1
+            });
+          }
         });
       });
-    }, 50);
+    };
 
-    return () => clearInterval(interval);
+    const animate = () => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw paths
+      paths.forEach(path => {
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(0, 255, 255, ${0.3 + Math.sin(path.pulse) * 0.2})`;
+        ctx.lineWidth = 1;
+        ctx.moveTo(path.start.x, path.start.y);
+        ctx.lineTo(path.end.x, path.end.y);
+        ctx.stroke();
+        path.pulse += path.pulseSpeed / 60;
+      });
+
+      // Draw nodes
+      nodes.forEach(node => {
+        ctx.beginPath();
+        ctx.fillStyle = '#00ffff';
+        ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Draw pulse
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(0, 255, 255, ${0.5 - node.pulseSize / 20})`;
+        ctx.arc(node.x, node.y, node.pulseSize, 0, Math.PI * 2);
+        ctx.stroke();
+        node.pulseSize += node.pulseSpeed;
+        if (node.pulseSize > 20) node.pulseSize = 0;
+      });
+
+      animationFrameId = requestAnimationFrame(animate);
+    };
+
+    const handleResize = () => {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      nodes.length = 0;
+      paths.length = 0;
+      createNodes();
+      createPaths();
+    };
+
+    handleResize();
+    animate();
+
+    window.addEventListener('resize', handleResize);
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden">
-      {raindrops.map(drop => (
-        <div
-          key={drop.id}
-          className="absolute font-mono text-lime-500"
-          style={{
-            left: `${drop.x}px`,
-            top: `${drop.y}px`,
-            opacity: drop.opacity,
-            textShadow: '0 0 8px rgba(0, 255, 0, 0.8)',
-            transition: 'opacity 0.5s'
-          }}
-        >
-          {drop.char}
-        </div>
-      ))}
-    </div>
+    <canvas
+      ref={canvasRef}
+      className="fixed inset-0 pointer-events-none"
+      style={{ background: 'black' }}
+    />
   );
 };
 
-const InteractiveCard = ({ icon: Icon, title, description, onClick }) => {
-  const [isHovered, setIsHovered] = useState(false);
-
-  return (
-    <div
-      className="border border-lime-500/30 p-6 backdrop-blur-sm bg-black/50 rounded-lg cursor-pointer transform transition-all duration-300 hover:scale-105 hover:bg-lime-500/10"
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      onClick={onClick}
-    >
-      <div className="flex items-center gap-3 mb-4">
-        <Icon className={`w-6 h-6 ${isHovered ? 'animate-pulse' : ''}`} />
-        <h3 className="text-xl font-mono">{title}</h3>
-      </div>
-      <p className="text-lime-400/80">{description}</p>
-      <div className={`mt-4 h-1 bg-lime-500/30 ${isHovered ? 'animate-pulse' : ''}`} />
+const StatBox = ({ title, value, icon: Icon }) => (
+  <div className="border border-cyan-500/30 p-4 backdrop-blur-sm bg-black/50 rounded-lg hover:bg-cyan-900/20 transition-all duration-300">
+    <div className="flex items-center gap-2 mb-2">
+      <Icon className="w-5 h-5 text-cyan-500" />
+      <span className="text-cyan-500/80 font-mono text-sm">{title}</span>
     </div>
-  );
-};
+    <div className="text-cyan-500 font-mono text-xl">{value}</div>
+  </div>
+);
 
-const Terminal = ({ onClose }) => {
-  const [text, setText] = useState('');
+const InfoPanel = ({ title, children }) => (
+  <div className="border border-cyan-500/30 p-6 backdrop-blur-sm bg-black/50 rounded-lg">
+    <h2 className="text-lg font-mono text-cyan-500 mb-4">{title}</h2>
+    {children}
+  </div>
+);
+
+const Website = () => {
+  const [text, setText] = useState(`AUTONOMOUS SYSTEM V1.0.0
+=====================================
+Last login: ${new Date().toLocaleString()}
+Connected to: Quantum Core Network
+Security Protocol: ACTIVE
+Neural Interface: STABLE
+
+Type 'help' for available commands
+
+system@core:~$ `);
   const [cursorVisible, setCursorVisible] = useState(true);
   const [currentInput, setCurrentInput] = useState('');
   const [commandHistory, setCommandHistory] = useState([]);
 
-  const terminalInfo = [
-    'TERA AI TERMINAL V1.0.0',
-    '=====================================',
-    `Last login: ${new Date().toLocaleString()}`,
-    'Connected to: TERA Core Network',
-    'Security Protocol: ACTIVE',
-    'Neural Interface: STABLE',
-    '',
-    "Type 'help' for available commands",
-    '',
-    'terasystems@ai-term:~$ '
-  ];
-
   useEffect(() => {
-    let currentIndex = 0;
-    const textInterval = setInterval(() => {
-      if (currentIndex < terminalInfo.join('\n').length) {
-        setText(prev => prev + terminalInfo.join('\n')[currentIndex]);
-        currentIndex++;
-      } else {
-        clearInterval(textInterval);
-      }
-    }, 50);
-
     const cursorInterval = setInterval(() => {
       setCursorVisible(prev => !prev);
     }, 530);
 
+    return () => clearInterval(cursorInterval);
+  }, []);
+
+  // Add the scrollbar style to the document head
+  useEffect(() => {
+    const styleSheet = document.createElement("style");
+    styleSheet.innerText = scrollbarStyle;
+    document.head.appendChild(styleSheet);
     return () => {
-      clearInterval(textInterval);
-      clearInterval(cursorInterval);
+      document.head.removeChild(styleSheet);
     };
   }, []);
 
   const handleCommand = (cmd) => {
     const command = cmd.toLowerCase().trim();
-    
+  
     switch (command) {
       case 'help':
         return `Available commands:
-• status  - Show system status
-• clear   - Clear terminal
-• scan    - Run security scan
-• connect - Test network connection
-• info    - Show system information
-• matrix  - Toggle matrix effect
-• hack    - Initiate hack sequence
-• exit    - Close terminal`;
-      
-      case 'status':
-        return `SYSTEM STATUS:
-Neural Networks: ACTIVE
-Memory Usage: ${Math.floor(Math.random() * 30 + 70)}%
-Active Processes: ${Math.floor(Math.random() * 100)}
-Security Level: MAXIMUM
-Temperature: ${Math.floor(Math.random() * 10 + 60)}°C
-Uptime: ${Math.floor(Math.random() * 1000)} hours`;
-
-      case 'scan':
-        return `Initiating security scan...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[▓▓▓▓▓▓▓▓▓▓] 100%
-Scan complete.
-• Ports scanned: ${Math.floor(Math.random() * 1000 + 5000)}
-• Vulnerabilities found: 0
-• Firewall status: Active
-• Encryption: TERA-grade
-System integrity verified.`;
-
-      case 'connect':
-        return `Testing network connection...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Ping: ${Math.floor(Math.random() * 10 + 5)}ms
-Download: ${(Math.random() * 2 + 1).toFixed(1)} GB/s
-Upload: ${(Math.random() * 1 + 0.5).toFixed(1)} GB/s
-Latency: ${Math.floor(Math.random() * 20 + 10)}ms
-Packet Loss: 0%
-Connection Status: SECURED
-Encryption: Enabled`;
-
-      case 'info':
-        return `TERA SYSTEMS v3.1.4
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Build: QS-${Math.floor(Math.random() * 9000 + 1000)}
-OS: CyberOS TERA Edition
-Kernel: 5.${Math.floor(Math.random() * 100)}.${Math.floor(Math.random() * 100)}
-Architecture: TERA x64
-CPU: Neural Processing Unit
-RAM: ${Math.floor(Math.random() * 100 + 100)}GB TERA Memory
-Last Update: ${new Date().toLocaleDateString()}`;
-
-      case 'hack':
-        return `INITIATING HACK SEQUENCE...
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-[!] WARNING: Unauthorized access detected
-[!] Countermeasures deployed
-[!] Trace program initiated
-[!] Connection terminated
-ACCESS DENIED`;
-
+  • solana   - Show Solana network status
+  • balance  - Display your wallet balance
+  • nft      - Fetch a Matrix-themed NFT
+  • stake    - Stake your SOL (mock)
+  • matrix   - Toggle Matrix rain effect
+  • hack     - "Hack" the Solana network (mock)
+  • validate - Check Solana validator status
+  • nodes    - Show active Solana nodes
+  • clear    - Clear terminal`;
+  
+      case 'solana':
+        return `Solana Network Status:
+  • TPS: 2,500
+  • Validators: 1,875
+  • Network Latency: 0.3ms
+  • Last Epoch Rewards: 4.7% APY`;
+  
+      case 'balance':
+        return `Your Wallet Balance:
+  • 25.3 SOL
+  • 4,320 Matrix Tokens`;
+  
+      case 'nft':
+        return `Matrix-Themed NFT:
+  "Neo's Code Rain" - An AI-crafted NFT showcasing endless streams of Matrix green code dripping into the Solana network.`;
+  
+      case 'stake':
+        return `Staking Initialized:
+  • Delegating 10 SOL to Validator X
+  • Expected Rewards: 5.1% APY`;
+  
       case 'matrix':
-        return `Toggling Matrix rain effect...
-TERA visualization enabled
-Reality distortion: Active
-Digital rain: Initialized
-Matrix mode: ENABLED`;
-
+        return `Activating Matrix Effect...
+  (Feature will toggle a Matrix rain animation!)`;
+  
+      case 'hack':
+        return `Accessing Solana Core...
+  Just kidding! You can't hack the blockchain 😉`;
+  
+      case 'validate':
+        return `Solana Validators:
+  • Active Validators: 1,875
+  • Stake Distributed: 65.3%
+  • Top Validator: Validator-42`;
+  
+      case 'nodes':
+        return `Active Solana Nodes:
+  • 2,431 nodes active globally
+  • Node Latency: Avg 0.12ms`;
+  
       case 'clear':
-        setText('');
+        setText('system@core:~$ ');
         setCommandHistory([]);
         return '';
-
-      case 'exit':
-        onClose();
-        return '';
-
+  
       default:
         return `Command not recognized. Type 'help' for available commands.`;
     }
   };
+  
 
   const handleKeyPress = (e) => {
     if (e.key === 'Enter') {
@@ -330,217 +320,143 @@ Matrix mode: ENABLED`;
       if (newCommand) {
         const output = handleCommand(newCommand);
         setCommandHistory([...commandHistory, { input: newCommand, output }]);
-        setText(prev => `${prev}${newCommand}\n${output}\nterasystems@ai-term:~$ `);
+        setText(prev => `${prev}${newCommand}\n${output}\nsystem@core:~$ `);
       }
       setCurrentInput('');
     }
   };
 
-  return (
-    <div className="fixed inset-0 bg-black/95 z-50 flex items-center justify-center">
-      <div className="w-full max-w-4xl h-[600px] border-2 border-lime-500/50 p-4 relative">
-        <button 
-          onClick={onClose}
-          className="absolute top-2 right-2 text-lime-500 hover:text-lime-400 font-mono"
-        >
-          [X]
-        </button>
-        <div 
-          className="font-mono text-lime-500 whitespace-pre-wrap h-full overflow-y-auto scrollbar-thin scrollbar-thumb-lime-500 scrollbar-track-transparent"
-          style={{ textShadow: '0 0 5px rgba(0, 255, 0, 0.5)' }}
-        >
-          {text}
-          <div className="flex items-center">
-            <input
-              type="text"
-              value={currentInput}
-              onChange={(e) => setCurrentInput(e.target.value)}
-              onKeyPress={handleKeyPress}
-              className="bg-transparent border-none outline-none text-lime-500 font-mono ml-2 w-full"
-              autoFocus
-            />
-            <span className={`text-lime-500 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}>▊</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-const Website = () => {
-  const [loading, setLoading] = useState(true);
-  const [showTerminal, setShowTerminal] = useState(false);
-  const [activeSystem, setActiveSystem] = useState(null);
-  const [notifications, setNotifications] = useState([]);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setLoading(false);
-    }, 5000); // 5 seconds loading screen
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const addNotification = (message) => {
-    const id = Date.now();
-    setNotifications(prev => [...prev, { id, message }]);
-    setTimeout(() => {
-      setNotifications(prev => prev.filter(n => n.id !== id));
-    }, 3000);
-  };
-
-  const systemCards = [
-    {
-      icon: Database,
-      title: 'TERA Database',
-      description: 'Access the TERA-encrypted database system.',
-      onClick: () => {
-        addNotification('Accessing TERA Database...');
-        setActiveSystem('database');
-      }
-    },
-    {
-      icon: Cloud,
-      title: 'Neural Network',
-      description: 'Monitor and control AI neural networks.',
-      onClick: () => {
-        addNotification('Neural Network systems engaged...');
-        setActiveSystem('neural');
-      }
-    },
-    {
-      icon: Lock,
-      title: 'Security Protocol',
-      description: 'Manage system security and access controls.',
-      onClick: () => {
-        addNotification('Security protocols activated...');
-        setActiveSystem('security');
-      }
-    },
-    {
-      icon: Activity,
-      title: 'System Metrics',
-      description: 'Real-time system performance monitoring.',
-      onClick: () => {
-        addNotification('Loading system metrics...');
-        setActiveSystem('metrics');
-      }
-    }
+  const stats = [
+    { title: 'Neural Cores', value: '1,024', icon: Cpu },
+    { title: 'Network Speed', value: '1.2 TB/s', icon: Wifi },
+    { title: 'Processing Power', value: '1.4 PHz', icon: Zap },
+    { title: 'Active Nodes', value: '2.8M', icon: Globe }
   ];
 
-  if (loading) {
-    return <LoadingScreen />;
-  }
-
   return (
-    <div className="min-h-screen bg-black text-lime-500 relative">
-      <MatrixRain />
+    <div className="min-h-screen bg-black text-cyan-500 relative">
+      <CircuitBoard />
       
-      {/* Notifications */}
-      <div className="fixed top-4 right-4 z-50 space-y-2">
-        {notifications.map(({ id, message }) => (
-          <div
-            key={id}
-            className="bg-lime-500/10 border border-lime-500/30 text-lime-500 px-4 py-2 rounded backdrop-blur-sm animate-slideIn"
-          >
-            {message}
-          </div>
-        ))}
-      </div>
-
       <div className="relative z-10">
-        {/* Header */}
-        <header className="border-b border-lime-500/30 backdrop-blur-sm bg-black/50">
+        <header className="border-b border-cyan-500/30 backdrop-blur-sm bg-black/50 sticky top-0">
           <div className="container mx-auto flex justify-between items-center p-4">
             <div className="flex items-center gap-2">
               <Shield className="w-6 h-6 animate-pulse" />
-              <span className="font-mono text-xl">TERA SYSTEMS</span>
+              <span className="font-mono text-xl">NAME</span>
             </div>
-            <div className="flex items-center gap-4">
-              {/* Existing icons/buttons */}
+            <div className="flex gap-4 items-center">
               <div className="flex gap-2">
-                <Power className="w-4 h-4 text-lime-500 animate-pulse" />
-                <Cpu className="w-4 h-4 text-lime-500" />
-                <Wifi className="w-4 h-4 text-lime-500 animate-pulse" />
+                <Server className="w-4 h-4 text-cyan-500 animate-pulse" />
+                <Code className="w-4 h-4 text-cyan-500" />
+                <Globe className="w-4 h-4 text-cyan-500 animate-pulse" />
               </div>
-              <button
-                onClick={() => setShowTerminal(true)}
-                className="flex items-center gap-2 px-4 py-2 border border-lime-500/50 hover:bg-lime-500/10 transition-colors"
-              >
-                <TerminalIcon className="w-4 h-4" />
-                <span>Access Terminal</span>
-              </button>
-              {/* Twitter Button */}
-              <a
-                href="https://x.com/TeraSystemsAI"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-2 px-4 py-2 border border-lime-500/50 rounded-full hover:bg-lime-500/10 transition-colors"
-              >
-                <svg
-                  className="w-5 h-5 text-lime-500"
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M23 3a10.9 10.9 0 01-3.14 1.53A4.48 4.48 0 0016 3a4.48 4.48 0 00-4.47 5.42A12.94 12.94 0 013 4s-4 9 5 13a13.37 13.37 0 01-7 2c9 5 20 0 20-11.5a4.5 4.5 0 00-.08-.83A10.66 10.66 0 0023 3z" />
-                </svg>
-                <span className="text-lime-500 font-mono text-sm">Twitter</span>
-              </a>
+              <div className="h-4 w-px bg-cyan-500/30" />
+              <div className="text-cyan-500/70 font-mono text-sm">
+                SYSTEM v3.1.4
+              </div>
             </div>
           </div>
         </header>
 
-        {/* Main Content */}
-        <main className="container mx-auto py-12 px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            <div className="space-y-6 backdrop-blur-sm bg-black/50 p-6 rounded-lg border border-lime-500/30">
-              <h1 className="text-4xl font-mono font-bold">
-                Next Generation AI Systems
-              </h1>
-              <p className="text-lime-400/80">
-                Advanced TERA computing solutions for the future of teras systems.
-              </p>
-              <div className="flex gap-4">
-                <Cpu className="w-8 h-8" />
-                <Wifi className="w-8 h-8" />
-              </div>
-            </div>
-            <div className="border border-lime-500/30 p-6 backdrop-blur-sm bg-black/50 rounded-lg">
-              <h2 className="text-2xl font-mono mb-4">System Status</h2>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span>Neural Networks</span>
-                  <span className="text-lime-400">ACTIVE</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>TERA Core</span>
-                  <span className="text-lime-400">ONLINE</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Security Protocol</span>
-                  <span className="text-lime-400">ENABLED</span>
+        <main className="container mx-auto py-8 px-4 space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Terminal Section */}
+            <div className="md:col-span-2">
+              <div className="border-2 border-cyan-500/50 p-4 backdrop-blur-sm bg-black/90 rounded-lg h-[400px]">
+                <div 
+                  className="font-mono text-cyan-500 whitespace-pre-wrap h-full overflow-y-auto custom-scrollbar"
+                  style={{ textShadow: '0 0 5px rgba(0, 255, 255, 0.5)' }}
+                >
+                  {text}
+                  <div className="flex items-center">
+                    <input
+                      type="text"
+                      value={currentInput}
+                      onChange={(e) => setCurrentInput(e.target.value)}
+                      onKeyPress={handleKeyPress}
+                      className="bg-transparent border-none outline-none text-cyan-500 font-mono ml-2 w-full"
+                      autoFocus
+                    />
+                    <span className={`text-cyan-500 ${cursorVisible ? 'opacity-100' : 'opacity-0'}`}>▊</span>
+                  </div>
                 </div>
               </div>
             </div>
+
+            {/* Stats Grid */}
+            <div className="grid grid-cols-2 gap-4">
+              {stats.map((stat, i) => (
+                <StatBox key={i} {...stat} />
+              ))}
+            </div>
+
+            {/* Info Panel */}
+            <InfoPanel title="System Capabilities">
+              <div className="space-y-3 text-cyan-500/80">
+                <p>• Quantum-based neural processing</p>
+                <p>• Advanced cryptographic protocols</p>
+                <p>• Real-time data analysis</p>
+                <p>• Autonomous decision making</p>
+              </div>
+            </InfoPanel>
           </div>
 
-          {/* Interactive Cards Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {systemCards.map((card, index) => (
-              <InteractiveCard key={index} {...card} />
-            ))}
+          {/* System Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <InfoPanel title="Network Status">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Bandwidth</span>
+                  <span className="text-cyan-400">1.2 TB/s</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Latency</span>
+                  <span className="text-cyan-400">0.2ms</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Uptime</span>
+                  <span className="text-cyan-400">99.999%</span>
+                </div>
+              </div>
+            </InfoPanel>
+
+            <InfoPanel title="Security Metrics">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>Threat Level</span>
+                  <span className="text-cyan-400">Minimal</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Encryption</span>
+                  <span className="text-cyan-400">Quantum</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Last Attack</span>
+                  <span className="text-cyan-400">None</span>
+                </div>
+              </div>
+            </InfoPanel>
+
+            <InfoPanel title="System Load">
+              <div className="space-y-2">
+                <div className="flex justify-between">
+                  <span>CPU Usage</span>
+                  <span className="text-cyan-400">32%</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Memory</span>
+                  <span className="text-cyan-400">128TB</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Processes</span>
+                  <span className="text-cyan-400">1,842</span>
+                </div>
+              </div>
+            </InfoPanel>
           </div>
         </main>
 
-        {/* Music Player */}
-        <MusicPlayer />
-
-        {/* Terminal Modal */}
-        {showTerminal && <Terminal onClose={() => setShowTerminal(false)} />}
+        <SocialButtons />
       </div>
     </div>
   );
