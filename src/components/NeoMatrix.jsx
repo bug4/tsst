@@ -292,7 +292,7 @@ zyon@core:~$ `);
   
       case 'ca':
         return `ZION Contract Address:
-  • Fetching Information ...`;
+  • 9FCXyixQ2ak8xuw1jnYen1jAhzb922Y9crCJQSBLpump`;
   
       case 'nodes':
         return `Active Solana Nodes:
